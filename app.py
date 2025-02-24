@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, abort, send_file, send_from_directory
 from flask_cors import CORS
-from wtforms import Form, SelectMultipleField
+from wtforms import Form, SelectMultipleField, SelectField
 import datetime
 import os
 import helper, loghelper
@@ -52,6 +52,7 @@ class MyForm(Form):
         'API Gateway', 'VPC', 'Auto Scaling', 'Load Balancer', 'CloudFront', 'SNSTopic',
     ]
     selected_option = SelectMultipleField('Resources', choices=[(option, option) for option in dropdown_options])
+    backend_storage = SelectField('Backend', choices=[('local', 'Local'), ('s3', 'S3'), ('remote', 'Remote')], default='local')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -59,6 +60,7 @@ def index():
     error = ""
     
     selected_options = request.form.getlist('resources') if request.method == 'POST' else []
+    backend_storage = request.form.get('backend_storage', 'local')
 
     # CSRF protection
     if request.method == 'POST':
@@ -85,7 +87,8 @@ def index():
             }
 
         # Initialize Terraform Provider
-        helper.providers(auth_method, credentials.get("access_key"), credentials.get("secret_key"), aws_region, request.form.get("iam_role_arn"))
+        # helper.providers(auth_method, credentials.get("access_key"), credentials.get("secret_key"), aws_region, request.form.get("iam_role_arn"))
+        helper.configure_backend(backend_storage, credentials.get("access_key"), credentials.get("secret_key"), aws_region)
 
         # Process selected AWS services
         for selected_option in selected_options:

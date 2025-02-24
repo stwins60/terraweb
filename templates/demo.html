@@ -83,6 +83,15 @@
                         <input type="text" name="aws_region" id="aws_region" placeholder="AWS REGION">
                     </div>
 
+                    <h3>Terraform Backend Storage</h3>
+                    <div class="field-input">
+                        <label for="backend_storage">Select Storage Option</label>
+                        <select class="form-select" name="backend_storage" id="backend_storage">
+                            <option value="local" {% if backend_storage == "local" %}selected{% endif %}>Local</option>
+                            <option value="s3" {% if backend_storage == "s3" %}selected{% endif %}>S3</option>
+                        </select>
+                    </div>
+
                     <h3>Select AWS Services</h3>
                     <div class="field-input">
                         <label for="resources">Select Resources</label>

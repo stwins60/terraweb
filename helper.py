@@ -33,34 +33,41 @@ def assume_role(role_arn):
         return None
 
 
-def providers(auth_method, access_key=None, secret_key=None, region=None, role_arn=None):
-    """ Configures AWS Provider with either Access Key or Assume Role """
-    if auth_method == "assume_role" and role_arn:
-        creds = assume_role(role_arn)
-        if not creds:
-            print("Failed to assume role. Exiting...")
-            return
+def configure_backend(backend_storage, access_key, secret_key, region):
+    """ Configures Terraform backend storage (Local or S3) and ensures AWS Provider is set """
 
-        terraform_config = f"""
-        provider "aws" {{
-            region = "{region}"
-            access_key = "{creds['access_key']}"
-            secret_key = "{creds['secret_key']}"
-            token      = "{creds['session_token']}"
+    # Provider block (always included)
+    provider_config = f"""
+    provider "aws" {{
+        region     = "{region}"
+        access_key = "{access_key}"
+        secret_key = "{secret_key}"
+    }}
+    """
+
+    # Backend storage configuration
+    if backend_storage == "s3":
+        backend_config = f"""
+        terraform {{
+            backend "s3" {{
+                bucket         = "my-tfstate-bucket"
+                key            = "terraform.tfstate"
+                region         = "{region}"
+                encrypt        = true
+                dynamodb_table = "terraform-lock"
+                access_key     = "{access_key}"
+                secret_key     = "{secret_key}"
+            }}
         }}
         """
     else:
-        terraform_config = f"""
-        provider "aws" {{
-            region = "{region}"
-            access_key = "{access_key}"
-            secret_key = "{secret_key}"
-        }}
-        """
+        backend_config = ""
 
+    # Write provider and backend config to a single file
     with open(f"{folder_dir}/providers.tf", "w") as f:
-        f.write(terraform_config)
+        f.write(provider_config + backend_config)
 
+    # Initialize Terraform
     tf.init()
     tf.fmt(diff=True)
 
