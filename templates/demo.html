@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terraweb</title>
+
+    <!-- Style CSS -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='assets/libs/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='assets/css/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='assets/images/favicon.ico') }}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static',filename='assets/libs/line-awesome/css/line-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='assets/libs/swiper/swiper-bundle.min.css') }}">
+</head>
+
+<body>
+    <div id="wrapper">
+        <header id="header" class="site-header">
+            <div class="container-fluid">
+                <div class="row flex-align-c inner">
+                    <div class="col-lg-3 col-6">
+                        <div class="header-left flex flex-align-c">
+                            <div class="logo">
+                                <a href="{{ url_for('index') }}">
+                                    <img src="{{ url_for('static',filename='assets/images/teraweb-logo(1).png') }}"
+                                        alt="logo" width="100px" height="28px">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="main-menu">
+                        <ul class="nav justify-content-center">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('survey') }}">Survey</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>  
+        </header>
+
+        <main id="main" class="site-main">
+            <div class="container">
+                <form action="{{ url_for('index') }}" method="post">
+                    <h3>AWS Authentication</h3>
+
+                    <!-- Toggle Switch for Authentication Type -->
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="authToggle">
+                        <label class="form-check-label" for="authToggle">Use Assume Role Instead of Access Keys</label>
+                    </div>
+
+                    <!-- Access Key Authentication -->
+                    <div id="accessKeyAuth">
+                        <div class="field-input">
+                            <label for="aws_access_key">AWS ACCESS KEY*</label>
+                            <input type="password" name="aws_access_key" id="aws_access_key" placeholder="AWS ACCESS KEY">
+                        </div>
+                        <div class="field-input">
+                            <label for="aws_secret_key">AWS SECRET KEY*</label>
+                            <input type="password" name="aws_secret_key" id="aws_secret_key" placeholder="AWS SECRET KEY">
+                        </div>
+                    </div>
+
+                    <!-- Assume Role Authentication -->
+                    <div id="assumeRoleAuth" style="display: none;">
+                        <div class="field-input">
+                            <label for="iam_role_arn">IAM Role ARN*</label>
+                            <input type="text" name="iam_role_arn" id="iam_role_arn" placeholder="Enter IAM Role ARN">
+                        </div>
+                    </div>
+
+                    <div class="field-input">
+                        <label for="aws_region">AWS REGION*</label>
+                        <input type="text" name="aws_region" id="aws_region" placeholder="AWS REGION">
+                    </div>
+
+                    <h3>Select AWS Services</h3>
+                    <div class="field-input">
+                        <label for="resources">Select Resources</label>
+                        <select class="form-select" name="resources" id="resources" multiple>
+                            {% for option in dropdown_options %}
+                                <option {% if option in selected_options %}selected{% endif %}>{{ option }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- AWS Service Configurations -->
+                    <div class="field-input aws-service" id="s3_val">
+                        <h4>S3 Configuration</h4>
+                        <input type="text" name="s3_bucket_name" class="form-control mb-3" placeholder="S3 Bucket Name">
+                        <input type="text" name="acl" class="form-control mb-3" placeholder="Access Control List">
+                    </div>
+
+                    <div class="field-input aws-service" id="ec2_val">
+                        <h4>EC2 Instance Configuration</h4>
+                        <input type="text" name="instance_name" class="form-control mb-3" placeholder="Instance Name">
+                        <input type="text" name="instance_type" class="form-control mb-3" placeholder="Instance Type">
+                        <input type="text" name="ami" class="form-control mb-3" placeholder="AMI">
+                        <input type="text" name="key_name" class="form-control mb-3" placeholder="Key Name">
+                        <input type="text" name="subnet_id" class="form-control mb-3" placeholder="Subnet ID">
+                        <input type="text" name="key_pair_public_key" class="form-control mb-3" placeholder="Public Key">
+                    </div>
+
+                    <div class="field-input aws-service" id="rds_val">
+                        <h4>RDS Configuration</h4>
+                        <input type="text" name="database_name" class="form-control mb-3" placeholder="Database Name">
+                        <input type="text" name="engine" class="form-control mb-3" placeholder="Engine">
+                        <input type="text" name="master_username" class="form-control mb-3" placeholder="Master Username">
+                        <input type="password" name="master_password" class="form-control mb-3" placeholder="Master Password">
+                    </div>
+
+                    <div class="field-input aws-service" id="dynamodb_val">
+                        <h4>DynamoDB Configuration</h4>
+                        <input type="text" name="table_name" class="form-control mb-3" placeholder="Table Name">
+                        <input type="text" name="hash_key" class="form-control mb-3" placeholder="Hash Key">
+                    </div>
+
+                    <div class="field-input aws-service" id="api_gateway_val">
+                        <h4>API Gateway Configuration</h4>
+                        <input type="text" name="api_name" class="form-control mb-3" placeholder="API Name">
+                    </div>
+
+                    <div class="field-input aws-service" id="vpc_val">
+                        <h4>VPC Configuration</h4>
+                        <input type="text" name="vpc_name" class="form-control mb-3" placeholder="VPC Name">
+                        <input type="text" name="cidr_block" class="form-control mb-3" placeholder="CIDR Block">
+                    </div>
+
+                    <div class="field-input aws-service" id="auto_scaling_val">
+                        <h4>Auto Scaling Configuration</h4>
+                        <input type="text" name="auto_scaling_group_name" class="form-control mb-3" placeholder="Auto Scaling Group Name">
+                        
+                        <input type="text" name="min_size" class="form-control mb-3" placeholder="Min Size">
+                        <input type="text" name="max_size" class="form-control mb-3" placeholder="Max Size">
+                        <input type="text" name="desired_capacity" class="form-control mb-3" placeholder="Desired Capacity">
+                        <h4>Launch Configuration</h4>
+                        <input type="text" name="launch_configuration_name" class="form-control mb-3" placeholder="Launch Configuration Name">
+                        <input type="text" name="ami" class="form-control mb-3" placeholder="AMI ID">
+                        <input type="text" name="instance_type" class="form-control mb-3" placeholder="Instance Type">
+                    </div>
+
+                    <div class="field-input aws-service" id="load_balancer_val">
+                        <h4>Load Balancer Configuration</h4>
+                        <input type="text" name="load_balancer_name" class="form-control mb-3" placeholder="Load Balancer Name">
+                        <input type="text" name="load_balancer_type" class="form-control mb-3" placeholder="Load Balancer Type">
+                        <input type="text" name="subnet_id" class="form-control mb-3" placeholder="Subnet ID">
+                    </div>
+
+                    <div class="field-input aws-service" id="cloudfront_val">
+                        <h4>CloudFront Configuration</h4>
+                        <input type="text" name="cloudfront_distribution_name" class="form-control mb-3" placeholder="CloudFront Distribution Name">
+                        <input type="text" name="origin" class="form-control mb-3" placeholder="Origin">
+                    </div>
+
+                    <div class="field-input aws-service" id="sns_topic_val">
+                        <h4>SNS Topic Configuration</h4>
+                        <input type="text" name="sns_topic_name" class="form-control mb-3" placeholder="SNS Topic Name">
+                    </div>
+
+                    <div class="field-input aws-service" id="lambda_val">
+                        <h4>Lambda Configuration</h4>
+                        <input type="text" name="lambda_function_name" class="form-control mb-3" placeholder="Lambda Function Name">
+                        <input type="text" name="runtime" class="form-control mb-3" placeholder="Runtime">
+                        <input type="text" name="handler" class="form-control mb-3" placeholder="Handler">
+                        <input type="text" name="role" class="form-control mb-3" placeholder="Role">
+                        <input type="text" name="bucket_name" class="form-control mb-3" placeholder="Bucket Name">
+                    </div>
+
+                    <input type="submit" name="submit" value="CREATE" class="btn btn-primary">
+                    <a href="{{ url_for('download') }}" class="btn btn-warning">Download tfstate</a>
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static',filename='assets/js/jquery-1.12.4.js') }}"></script>
+    <script src="{{ url_for('static',filename='assets/libs/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            function toggleAuthFields() {
+                if ($('#authToggle').prop('checked')) {
+                    $('#accessKeyAuth').hide();
+                    $('#assumeRoleAuth').show();
+                } else {
+                    $('#accessKeyAuth').show();
+                    $('#assumeRoleAuth').hide();
+                }
+            }
+    
+            function toggleServices() {
+                var selected = $('#resources').val() || [];
+                $('.aws-service').hide();  // Hide all AWS service input fields
+    
+                var serviceMapping = {
+                    "S3": "s3_val",
+                    "EC2": "ec2_val",
+                    "RDS": "rds_val",
+                    "IAM Role": "iam_role_val",
+                    "Lambda": "lambda_val",
+                    "DynamoDB": "dynamodb_val",
+                    "API Gateway": "api_gateway_val",
+                    "VPC": "vpc_val",
+                    "Auto Scaling": "auto_scaling_val",
+                    "Load Balancer": "load_balancer_val",
+                    "CloudFront": "cloudfront_val",
+                    "SNSTopic": "sns_topic_val"
+                };
+    
+                selected.forEach(function(service) {
+                    var id = serviceMapping[service]; 
+                    if (id) {
+                        $('#' + id).show();
+                    }
+                });
+            }
+    
+            // Attach event listeners
+            $('#authToggle').change(toggleAuthFields);
+            $('#resources').change(toggleServices);
+    
+            // Run functions on page load
+            toggleAuthFields();
+            toggleServices();
+        });
+    </script>
+
+</body>
+</html>

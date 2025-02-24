@@ -1,0 +1,13 @@
+flask
+flask-cors
+PyYAML
+wtforms
+gunicorn
+boto3
+python-dotenv
+psycopg2-binary
+python-terraform
+passlib
+flask-login
+flask-wtf
+mysql-connector
