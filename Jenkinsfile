@@ -19,7 +19,9 @@ pipeline {
         stage('Build') {
             steps {
                 // Build the project
-                docker buid -t ${DOCKER_IMAGE}:${BRANCH_NAME}-${BUILD_NUMBER} .
+                script {
+                    sh "docker buid -t ${DOCKER_IMAGE}:${BRANCH_NAME}-${BUILD_NUMBER} ."
+                }
             }
         }
     }
