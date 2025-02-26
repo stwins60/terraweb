@@ -20,7 +20,7 @@ pipeline {
             steps {
                 // Build the project
                 script {
-                    sh "docker buid -t ${DOCKER_IMAGE}:${BRANCH_NAME}-${BUILD_NUMBER} ."
+                    sh "docker build -t ${DOCKER_IMAGE}:${BRANCH_NAME}-${BUILD_NUMBER} ."
                 }
             }
         }
